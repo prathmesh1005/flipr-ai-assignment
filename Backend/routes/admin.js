@@ -44,7 +44,8 @@ router.post('/projects',
 
       // Process image (resize to 450x350)
       const processedPath = await processImage(req.file.path);
-      const imageUrl = `/uploads/${processedPath.split('\\').pop().split('/').pop()}`;
+      const filename = require('path').basename(processedPath);
+      const imageUrl = `/uploads/${filename}`;
 
       const project = new Project({
         name: req.body.name,
@@ -87,7 +88,8 @@ router.post('/clients',
 
       // Process image (resize to 450x350)
       const processedPath = await processImage(req.file.path);
-      const imageUrl = `/uploads/${processedPath.split('\\').pop().split('/').pop()}`;
+      const filename = require('path').basename(processedPath);
+      const imageUrl = `/uploads/${filename}`;
 
       const client = new Client({
         name: req.body.name,
