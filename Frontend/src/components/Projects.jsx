@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import api, { getImageUrl } from '../api/axios';
 
 function Projects() {
   const [projects, setProjects] = useState([]);
@@ -56,7 +56,7 @@ function Projects() {
               <div key={project._id} className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100">
                 <div className="overflow-hidden h-52 bg-gray-100 relative group">
                   <img
-                    src={project.imageUrl}
+                    src={getImageUrl(project.imageUrl)}
                     alt={project.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

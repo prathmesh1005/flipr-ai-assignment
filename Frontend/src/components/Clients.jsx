@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import api, { getImageUrl } from '../api/axios';
 
 function Clients() {
   const [clients, setClients] = useState([]);
@@ -45,7 +45,7 @@ function Clients() {
               <div key={client._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 text-center">
                 <div className="flex justify-center mb-4">
                   <img
-                    src={client.imageUrl}
+                    src={getImageUrl(client.imageUrl)}
                     alt={client.name}
                     className="w-20 h-20 rounded-full object-cover border-4 border-gray-100"
                   />
