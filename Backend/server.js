@@ -46,6 +46,18 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Cross-Origin-Resource-Policy', 'cross-origin');
   
+  // Set proper content-type for image files
+  const ext = path.extname(req.url).toLowerCase();
+  const mimeTypes = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp'
+  };
+  const mimeType = mimeTypes[ext] || 'application/octet-stream';
+  res.header('Content-Type', mimeType);
+  
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
