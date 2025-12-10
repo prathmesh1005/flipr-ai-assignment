@@ -1,8 +1,7 @@
 {
-  "projects": [
-    {
-      "name": "flipr-ai-assignment",
-      "srcDir": "Frontend"
-    }
-  ]
+  "buildCommand": "cd Frontend && npm run build",
+  "outputDirectory": "Frontend/dist",
+  "env": {
+    "VITE_API_URL": "@flipr_api_url"
+  }
 }
