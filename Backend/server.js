@@ -9,60 +9,66 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'https://flipr-ai-assignment.vercel.app',
-  'https://flipr-ai-assignment.vercel.app/'
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'http://localhost:5173',
+      'https://flipr-ai-assignment.vercel.app',
+      'https://flipr-ai-assignment.vercel.app/',
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ];
+    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Check if origin is in allowedOrigins or normalize it
+    // Normalize and check origin
     const normalizedOrigin = origin.endsWith('/') ? origin : origin + '/';
-    const isAllowed = allowedOrigins.some(allowed => 
-      origin === allowed || normalizedOrigin === allowed + '/' || origin === allowed.replace(/\/$/, '')
-    );
+    const isAllowed = allowedOrigins.some(allowed => {
+      const normalizedAllowed = allowed.endsWith('/') ? allowed : allowed + '/';
+      return origin === allowed || normalizedOrigin === normalizedAllowed;
+    });
     
-    if (isAllowed) {
+    if (isAllowed || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Apply CORS globally
+app.use(cors(corsOptions));
+
+// Additional headers middleware for all responses
+app.use((req, res, next) => {
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from uploads directory with CORS headers
-app.use('/uploads', (req, res, next) => {
-  // Set CORS headers for image responses
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-  
-  // Set proper content-type for image files
-  const ext = path.extname(req.url).toLowerCase();
-  const mimeTypes = {
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.gif': 'image/gif',
-    '.webp': 'image/webp'
-  };
-  const mimeType = mimeTypes[ext] || 'application/octet-stream';
-  res.header('Content-Type', mimeType);
-  
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Set proper content-type for image files
+    const ext = path.extname(filePath).toLowerCase();
+    const mimeTypes = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp'
+    };
+    const mimeType = mimeTypes[ext] || 'application/octet-stream';
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
   }
-  next();
-}, express.static(path.join(__dirname, 'uploads')));
+}));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
