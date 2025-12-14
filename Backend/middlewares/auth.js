@@ -1,9 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * Simple JWT authentication middleware for admin routes
- * For production, implement proper user authentication
- */
 function authenticateAdmin(req, res, next) {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -20,10 +16,6 @@ function authenticateAdmin(req, res, next) {
   }
 }
 
-/**
- * Generate admin token (for demo purposes)
- * In production, implement proper login flow
- */
 function generateAdminToken() {
   return jwt.sign(
     { admin: true, timestamp: Date.now() },
