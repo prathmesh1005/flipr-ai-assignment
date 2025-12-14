@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
   if (token) {
@@ -18,14 +17,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper function to build full image URL
 export const getImageUrl = (imageUrl) => {
   if (!imageUrl) return '';
-  // If it's already a full URL, return as is
   if (imageUrl.startsWith('http')) {
     return imageUrl;
   }
-  // Otherwise prepend the API URL
   return `${API_URL}${imageUrl}`;
 };
 
